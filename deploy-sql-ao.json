@@ -116,25 +116,11 @@
         "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
       },
       "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture-sql/master/"
-    },
-    "_artifactsLocationSasToken": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Auto-generated token to access _artifactsLocation"
-      }
-    },
-    "PIPSQLVM1DnsName": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "[concat('sql1', uniqueString(resourceGroup().id))]"
-    },
-    "PIPSQLVM2DnsName": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "[concat('sql2', uniqueString(resourceGroup().id))]"
     }
   },
   "variables": {
+    "PIPSQLVM1DnsName": "[concat('sql1', uniqueString(resourceGroup().id))]",
+    "PIPSQLVM2DnsName": "[concat('sql2', uniqueString(resourceGroup().id))]",
     "imagePublisherWitness": "MicrosoftWindowsServer",
     "imageOfferWitness": "WindowsServer",
     "imagePublisherSQL": "MicrosoftSqlServer",
@@ -375,8 +361,7 @@
             "typeHandlerVersion": "2.72",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]",
-              "sasToken": "[parameters('_artifactsLocationSasToken')]",
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]"
               "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
               "properties": {
                 "nodeName": "[parameters('SQLVM-1Name')]"
@@ -404,7 +389,7 @@
             "autoUpgradeMinorVersion": false,
             "settings": {
               "fileUris": [
-                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'))]"
               ],
               "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
             }
@@ -529,8 +514,7 @@
             "typeHandlerVersion": "2.72",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc2.zip')]",
-              "sasToken": "[parameters('_artifactsLocationSasToken')]",
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc2.zip')]"
               "configurationFunction": "[variables('SQLDSC2ConfigurationFunction')]",
               "properties": {
                 "nodeName": "[parameters('SQLVM-2Name')]"
@@ -558,7 +542,7 @@
             "autoUpgradeMinorVersion": false,
             "settings": {
               "fileUris": [
-                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'))]"
               ],
               "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin2ScriptFilePath'))]"
             }
@@ -658,7 +642,7 @@
             "autoUpgradeMinorVersion": false,
             "settings": {
               "fileUris": [
-                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'))]"
               ],
               "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin3ScriptFilePath'))]"
             }
@@ -678,7 +662,7 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[parameters('PIPSQLVM1DnsName')]"
+          "domainNameLabel": "[variables('PIPSQLVM1DnsName')]"
         }
       }
     },
@@ -694,7 +678,7 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[parameters('PIPSQLVM2DnsName')]"
+          "domainNameLabel": "[variables('PIPSQLVM2DnsName')]"
         }
       }
     }
