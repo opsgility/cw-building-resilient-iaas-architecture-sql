@@ -361,7 +361,7 @@
             "typeHandlerVersion": "2.72",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]",
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/DSC/', 'dsc1.zip')]",
               "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
               "properties": {
                 "nodeName": "[parameters('SQLVM-1Name')]"
@@ -514,7 +514,7 @@
             "typeHandlerVersion": "2.72",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc2.zip')]",
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/DSC/', 'dsc2.zip')]",
               "configurationFunction": "[variables('SQLDSC2ConfigurationFunction')]",
               "properties": {
                 "nodeName": "[parameters('SQLVM-2Name')]"
