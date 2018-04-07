@@ -22,7 +22,7 @@
       "metadata": {
         "description": "domain to join password"
       },
-      "defaultValue":  "litware.com"
+      "defaultValue": "litware.com"
     },
     "SQLImageSKU": {
       "type": "string",
@@ -114,7 +114,8 @@
       "type": "string",
       "metadata": {
         "description": "Auto-generated container in staging storage account to receive post-build staging folder upload"
-      }
+      },
+      "defaultValue": "https://raw.githubusercontent.com/opsgility/cw-building-resilient-iaas-architecture-sql/master/"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
@@ -162,12 +163,12 @@
     "SQLVM-1dataDisk2VhdName": "[concat('http://',variables('vhdStorageName'),'.blob.core.windows.net/','vhds','/','SQL1BackupandLogs.vhd')]",
     "SQLVM-2dataDisk1VhdName": "[concat('http://',variables('vhdStorageName'),'.blob.core.windows.net/','vhds','/','SQL2Data.vhd')]",
     "SQLVM-2dataDisk2VhdName": "[concat('http://',variables('vhdStorageName'),'.blob.core.windows.net/','vhds','/','SQL2BackupandLogs.vhd')]",
-    "SQLDSCConfigurationFunction": "SQLDSCConfiguration.ps1\\Main",
+    "SQLDSCConfigurationFunction": "SQLDSC1Configuration.ps1\\Main",
     "SQLDSC2ConfigurationFunction": "SQLDSC2Configuration.ps1\\Main",
     "WitnessDSCConfigurationFunction": "WitnessDSCConfiguration.ps1\\Main",
-    "DomJoin1ScriptFilePath": "DeploySQLInfra/CustomScripts/DomJoin1.ps1",
-    "DomJoin2ScriptFilePath": "DeploySQLInfra/CustomScripts/DomJoin2.ps1",
-    "DomJoin3ScriptFilePath": "DeploySQLInfra/CustomScripts/DomJoin3.ps1",
+    "DomJoin1ScriptFilePath": "CustomScripts/DomJoin1.ps1",
+    "DomJoin2ScriptFilePath": "CustomScripts/DomJoin2.ps1",
+    "DomJoin3ScriptFilePath": "CustomScripts/DomJoin3.ps1",
     "PIPSQLVM1Name": "PIPSQLVM1",
     "PIPSQLVM2Name": "PIPSQLVM2"
   },
@@ -239,7 +240,7 @@
               "frontendPort": 1433,
               "backendPort": 1433,
               "idleTimeoutInMinutes": 4,
-              "enableFloatingIP":  true
+              "enableFloatingIP": true
             },
             "name": "lbrule"
           }
@@ -257,445 +258,445 @@
         ]
       }
     },
-      {
-          "name": "[variables('SQLVM-1NicName')]",
-          "type": "Microsoft.Network/networkInterfaces",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [
-            "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-              "[concat('Microsoft.Network/publicIPAddresses/', variables('PIPSQLVM1Name'))]"
-          ],
-          "tags": {
-              "displayName": "SQLVM-1Nic"
-          },
-          "properties": {
-              "ipConfigurations": [
-                  {
-                      "name": "ipconfig1",
-                    "properties": {
-                      "privateIPAllocationMethod": "Dynamic",
-                      "subnet": {
-                        "id": "[variables('subnetRef')]"
-                      },
-                      "loadBalancerBackendAddressPools": [
-                        {
-                          "id": "[concat(variables('lbId'), '/backendAddressPools/BackendPool1')]"
-                        }
-                      ],
-                        "publicIPAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPSQLVM1Name'))]"
-                        }
-                    }
-                  }
-              ]
-          }
+    {
+      "name": "[variables('SQLVM-1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('PIPSQLVM1Name'))]"
+      ],
+      "tags": {
+        "displayName": "SQLVM-1Nic"
       },
-      {
-          "name": "[parameters('SQLVM-1Name')]",
-          "type": "Microsoft.Compute/virtualMachines",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-        "dependsOn": [
-          "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
-          "[concat('Microsoft.Network/networkInterfaces/', variables('SQLVM-1NicName'))]",
-          "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
-        ],
-          "tags": {
-              "displayName": "SQLVM-1"
-          },
-        "properties": {
-          "hardwareProfile": {
-            "vmSize": "[variables('SQLVM-1VmSize')]"
-          },
-          "availabilitySet": {
-            "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
-          },
-          "osProfile": {
-            "computerName": "[parameters('SQLVM-1Name')]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPassword')]"
-          },
-          "storageProfile": {
-            "imageReference": {
-              "publisher": "[variables('imagePublisherSQL')]",
-              "offer": "[variables('imageOfferSQL')]",
-              "sku": "[parameters('SQLImageSKU')]",
-              "version": "latest"
-            },
-            "osDisk": {
-              "name": "SQLVM-1OSDisk",
-              "vhd": {
-                "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('SQLVM-1StorageAccountContainerName'), '/', variables('SQLVM-1OSDiskName'), '.vhd')]"
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
               },
-              "caching": "ReadWrite",
-              "createOption": "FromImage"
-            },
-            "dataDisks": [
-              {
-                "name": "SQL1datadisk1",
-                "diskSizeGB": "1023",
-                "lun": 0,
-                "vhd": { "uri": "[variables('SQLVM-1dataDisk1VhdName')]" },
-                "createOption": "Empty"
-              },
-              {
-                "name": "SQL1datadisk2",
-                "diskSizeGB": "1023",
-                "lun": 1,
-                "vhd": { "uri": "[variables('SQLVM-1dataDisk2VhdName')]" },
-                "createOption": "Empty"
-              }
-            ]
-          },
-          "networkProfile": {
-            "networkInterfaces": [
-              {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SQLVM-1NicName'))]"
-              }
-            ]
-          }
-        },
-          "resources": [
-              {
-                  "name": "SQLDSC",
-                  "type": "extensions",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2015-06-15",
-                  "dependsOn": [
-                      "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]"
-                  ],
-                  "tags": {
-                      "displayName": "SQLDSC"
-                  },
-                  "properties": {
-                      "publisher": "Microsoft.Powershell",
-                      "type": "DSC",
-                      "typeHandlerVersion": "2.72",
-                      "autoUpgradeMinorVersion": true,
-                      "settings": {
-                          "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc.zip')]",
-                          "sasToken": "[parameters('_artifactsLocationSasToken')]",
-                          "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
-                        "properties": {
-                          "nodeName": "[parameters('SQLVM-1Name')]"
-                        }
-                      },
-                      "protectedSettings": { }
-                  }
-              },
-              {
-                  "name": "DomJoin1",
-                  "type": "extensions",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2015-06-15",
-                  "dependsOn": [
-                    "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]",
-                    "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'),'/extensions/SQLDSC')]"
-                  ],
-                  "tags": {
-                      "displayName": "DomJoin1"
-                  },
-                  "properties": {
-                      "publisher": "Microsoft.Compute",
-                      "type": "CustomScriptExtension",
-                      "typeHandlerVersion": "1.4",
-                      "autoUpgradeMinorVersion": false,
-                      "settings": {
-                          "fileUris": [
-                              "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
-                          ],
-                          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
-                      }
-                  }
-              }
-          ]
-      },
-      {
-          "name": "[variables('SQLVM-2NicName')]",
-          "type": "Microsoft.Network/networkInterfaces",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-        "dependsOn": [
-          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
-            "[concat('Microsoft.Network/publicIPAddresses/', variables('PIPSQLVM2Name'))]"
-        ],
-          "tags": {
-              "displayName": "SQLVM-2Nic"
-          },
-          "properties": {
-              "ipConfigurations": [
+              "loadBalancerBackendAddressPools": [
                 {
-                  "name": "ipconfig1",
-                  "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
-                    "subnet": {
-                      "id": "[variables('subnetRef')]"
-                    },
-                      "publicIPAddress": {
-                          "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPSQLVM2Name'))]"
-                      }
-                  },
-                  "loadBalancerBackendAddressPools": [
-                    {
-                      "id": "[concat(variables('lbId'), '/backendAddressPools/BackendPool1')]"
-                    }
-                  ]
+                  "id": "[concat(variables('lbId'), '/backendAddressPools/BackendPool1')]"
                 }
-              ]
+              ],
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPSQLVM1Name'))]"
+              }
+            }
           }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('SQLVM-1Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('SQLVM-1NicName'))]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+      ],
+      "tags": {
+        "displayName": "SQLVM-1"
       },
-      {
-          "name": "[parameters('SQLVM-2Name')]",
-          "type": "Microsoft.Compute/virtualMachines",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-        "dependsOn": [
-          "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
-          "[concat('Microsoft.Network/networkInterfaces/', variables('SQLVM-2NicName'))]",
-          "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
-        ],
-          "tags": {
-              "displayName": "SQLVM-2"
-          },
-        "properties": {
-          "hardwareProfile": {
-            "vmSize": "[variables('SQLVM-2VmSize')]"
-          },
-          "availabilitySet": {
-            "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
-          },
-          "osProfile": {
-            "computerName": "[parameters('SQLVM-2Name')]",
-            "adminUsername": "[parameters('AdminUsername')]",
-            "adminPassword": "[parameters('AdminPassword')]"
-          },
-          "storageProfile": {
-            "imageReference": {
-              "publisher": "[variables('imagePublisherSQL')]",
-              "offer": "[variables('imageOfferSQL')]",
-              "sku": "[parameters('SQLImageSKU')]",
-              "version": "latest"
-            },
-            "osDisk": {
-              "name": "SQLVM-2OSDisk",
-              "vhd": {
-                "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('SQLVM-2StorageAccountContainerName'), '/', variables('SQLVM-2OSDiskName'), '.vhd')]"
-              },
-              "caching": "ReadWrite",
-              "createOption": "FromImage"
-            },
-            "dataDisks": [
-              {
-                "name": "SQL2datadisk1",
-                "diskSizeGB": "1023",
-                "lun": 0,
-                "vhd": { "uri": "[variables('SQLVM-2dataDisk1VhdName')]" },
-                "createOption": "Empty"
-              },
-              {
-                "name": "SQL2datadisk2",
-                "diskSizeGB": "1023",
-                "lun": 1,
-                "vhd": { "uri": "[variables('SQLVM-2dataDisk2VhdName')]" },
-                "createOption": "Empty"
-              }
-            ]
-          },
-          "networkProfile": {
-            "networkInterfaces": [
-              {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SQLVM-2NicName'))]"
-              }
-            ]
-          }
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('SQLVM-1VmSize')]"
         },
-          "resources": [
-              {
-                  "name": "SQLDSC2",
-                  "type": "extensions",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2015-06-15",
-                  "dependsOn": [
-                      "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'))]"
-                  ],
-                  "tags": {
-                      "displayName": "SQLDSC2"
-                  },
-                  "properties": {
-                      "publisher": "Microsoft.Powershell",
-                      "type": "DSC",
-                      "typeHandlerVersion": "2.72",
-                      "autoUpgradeMinorVersion": true,
-                      "settings": {
-                          "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc.zip')]",
-                          "sasToken": "[parameters('_artifactsLocationSasToken')]",
-                          "configurationFunction": "[variables('SQLDSC2ConfigurationFunction')]",
-                        "properties": {
-                          "nodeName": "[parameters('SQLVM-2Name')]"
-                        }
-                      },
-                      "protectedSettings": { }
-                  }
-              },
-              {
-                  "name": "DomJoin2",
-                  "type": "extensions",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2015-06-15",
-                "dependsOn": [
-                  "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'))]",
-                  "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'),'/extensions/SQLDSC2')]"
-                ],
-                  "tags": {
-                      "displayName": "DomJoin2"
-                  },
-                  "properties": {
-                      "publisher": "Microsoft.Compute",
-                      "type": "CustomScriptExtension",
-                      "typeHandlerVersion": "1.4",
-                      "autoUpgradeMinorVersion": false,
-                      "settings": {
-                          "fileUris": [
-                              "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
-                          ],
-                          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin2ScriptFilePath'))]"
-                      }
-                  }
-              }
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('SQLVM-1Name')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisherSQL')]",
+            "offer": "[variables('imageOfferSQL')]",
+            "sku": "[parameters('SQLImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "SQLVM-1OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('SQLVM-1StorageAccountContainerName'), '/', variables('SQLVM-1OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "SQL1datadisk1",
+              "diskSizeGB": "1023",
+              "lun": 0,
+              "vhd": { "uri": "[variables('SQLVM-1dataDisk1VhdName')]" },
+              "createOption": "Empty"
+            },
+            {
+              "name": "SQL1datadisk2",
+              "diskSizeGB": "1023",
+              "lun": 1,
+              "vhd": { "uri": "[variables('SQLVM-1dataDisk2VhdName')]" },
+              "createOption": "Empty"
+            }
           ]
-      },
-      {
-          "name": "[variables('WitnessNicName')]",
-          "type": "Microsoft.Network/networkInterfaces",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [
-          ],
-        "tags": {
-          "displayName": "WitnessNic"
         },
-          "properties": {
-              "ipConfigurations": [
-                  {
-                    "name": "ipconfig1",
-                      "properties": {
-                          "privateIPAllocationMethod": "Dynamic",
-                          "subnet": {
-                              "id": "[variables('subnetRef')]"
-                          }
-                      }
-                  }
-              ]
-          }
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SQLVM-1NicName'))]"
+            }
+          ]
+        }
       },
+      "resources": witn
       {
-          "name": "[parameters('WitnessName')]",
-          "type": "Microsoft.Compute/virtualMachines",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
+        "name": "SQLDSC",
+        "type": "extensions",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2015-06-15",
         "dependsOn": [
-          "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
-          "[concat('Microsoft.Network/networkInterfaces/', variables('WitnessNicName'))]",
-          "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]"
         ],
-          "tags": {
-              "displayName": "Witness"
-          },
+        "tags": {
+          "displayName": "SQLDSC"
+        },
         "properties": {
-          "hardwareProfile": {
-            "vmSize": "[variables('WitnessVmSize')]"
-          },
-          "availabilitySet": {
-            "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
-          },
-          "osProfile": {
-            "computerName": "[parameters('WitnessName')]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPassword')]"
-          },
-          "storageProfile": {
-            "imageReference": {
-              "publisher": "[variables('imagePublisherWitness')]",
-              "offer": "[variables('imageOfferWitness')]",
-              "sku": "[parameters('WitnessWindowsOSVersion')]",
-              "version": "latest"
-            },
-            "osDisk": {
-              "name": "WitnessOSDisk",
-              "vhd": {
-                "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('WitnessStorageAccountContainerName'), '/', variables('WitnessOSDiskName'), '.vhd')]"
-              },
-              "caching": "ReadWrite",
-              "createOption": "FromImage"
+          "publisher": "Microsoft.Powershell",
+          "type": "DSC",
+          "typeHandlerVersion": "2.72",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]",
+            "sasToken": "[parameters('_artifactsLocationSasToken')]",
+            "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
+            "properties": {
+              "nodeName": "[parameters('SQLVM-1Name')]"
             }
           },
-          "networkProfile": {
-            "networkInterfaces": [
+          "protectedSettings": {}
+        }
+      },
+      {
+        "name": "DomJoin1",
+        "type": "extensions",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2015-06-15",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]",
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'),'/extensions/SQLDSC')]"
+        ],
+        "tags": {
+          "displayName": "DomJoin1"
+        },
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "1.4",
+          "autoUpgradeMinorVersion": false,
+          "settings": {
+            "fileUris": [
+              "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+            ],
+            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
+          }
+        }
+      }
+      ]
+    },
+    {
+      "name": "[variables('SQLVM-2NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('PIPSQLVM2Name'))]"
+      ],
+      "tags": {
+        "displayName": "SQLVM-2Nic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PIPSQLVM2Name'))]"
+              }
+            },
+            "loadBalancerBackendAddressPools": [
               {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WitnessNicName'))]"
+                "id": "[concat(variables('lbId'), '/backendAddressPools/BackendPool1')]"
               }
             ]
           }
-        },
-          "resources": [
-              {
-                  "name": "DomJoin3",
-                  "type": "extensions",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2015-06-15",
-                  "dependsOn": [
-                    "[concat('Microsoft.Compute/virtualMachines/', parameters('WitnessName'))]"
-                  ],
-                  "tags": {
-                      "displayName": "DomJoin3"
-                  },
-                  "properties": {
-                      "publisher": "Microsoft.Compute",
-                      "type": "CustomScriptExtension",
-                      "typeHandlerVersion": "1.4",
-                      "autoUpgradeMinorVersion": false,
-                      "settings": {
-                          "fileUris": [
-                              "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
-                          ],
-                          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin3ScriptFilePath'))]"
-                      }
-                  }
-              }
-          ]
-      },
-      {
-          "name": "[variables('PIPSQLVM1Name')]",
-          "type": "Microsoft.Network/publicIPAddresses",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [ ],
-          "tags": {
-              "displayName": "PIPSQLVM1"
-          },
-          "properties": {
-              "publicIPAllocationMethod": "Dynamic",
-              "dnsSettings": {
-                  "domainNameLabel": "[parameters('PIPSQLVM1DnsName')]"
-              }
-          }
-      },
-      {
-          "name": "[variables('PIPSQLVM2Name')]",
-          "type": "Microsoft.Network/publicIPAddresses",
-          "location": "[resourceGroup().location]",
-          "apiVersion": "2015-06-15",
-          "dependsOn": [ ],
-          "tags": {
-              "displayName": "PIPSQLVM2"
-          },
-          "properties": {
-              "publicIPAllocationMethod": "Dynamic",
-              "dnsSettings": {
-                  "domainNameLabel": "[parameters('PIPSQLVM2DnsName')]"
-              }
-          }
+        ]
       }
+    },
+    {
+      "name": "[parameters('SQLVM-2Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('SQLVM-2NicName'))]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+      ],
+      "tags": {
+        "displayName": "SQLVM-2"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('SQLVM-2VmSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('SQLVM-2Name')]",
+          "adminUsername": "[parameters('AdminUsername')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisherSQL')]",
+            "offer": "[variables('imageOfferSQL')]",
+            "sku": "[parameters('SQLImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "SQLVM-2OSDisk",
+            "vhd": {
+              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('SQLVM-2StorageAccountContainerName'), '/', variables('SQLVM-2OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "SQL2datadisk1",
+              "diskSizeGB": "1023",
+              "lun": 0,
+              "vhd": { "uri": "[variables('SQLVM-2dataDisk1VhdName')]" },
+              "createOption": "Empty"
+            },
+            {
+              "name": "SQL2datadisk2",
+              "diskSizeGB": "1023",
+              "lun": 1,
+              "vhd": { "uri": "[variables('SQLVM-2dataDisk2VhdName')]" },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SQLVM-2NicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "SQLDSC2",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'))]"
+          ],
+          "tags": {
+            "displayName": "SQLDSC2"
+          },
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.72",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc2.zip')]",
+              "sasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationFunction": "[variables('SQLDSC2ConfigurationFunction')]",
+              "properties": {
+                "nodeName": "[parameters('SQLVM-2Name')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        },
+        {
+          "name": "DomJoin2",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-2Name'),'/extensions/SQLDSC2')]"
+          ],
+          "tags": {
+            "displayName": "DomJoin2"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": false,
+            "settings": {
+              "fileUris": [
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+              ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin2ScriptFilePath'))]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('WitnessNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+      ],
+      "tags": {
+        "displayName": "WitnessNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('WitnessName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('vhdStorageName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('WitnessNicName'))]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+      ],
+      "tags": {
+        "displayName": "Witness"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('WitnessVmSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('WitnessName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisherWitness')]",
+            "offer": "[variables('imageOfferWitness')]",
+            "sku": "[parameters('WitnessWindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "WitnessOSDisk",
+            "vhd": {
+              "uri": "[concat('http://', variables('vhdStorageName'), '.blob.core.windows.net/', variables('WitnessStorageAccountContainerName'), '/', variables('WitnessOSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('WitnessNicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "DomJoin3",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('WitnessName'))]"
+          ],
+          "tags": {
+            "displayName": "DomJoin3"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": false,
+            "settings": {
+              "fileUris": [
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+              ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin3ScriptFilePath'))]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('PIPSQLVM1Name')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "PIPSQLVM1"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('PIPSQLVM1DnsName')]"
+        }
+      }
+    },
+    {
+      "name": "[variables('PIPSQLVM2Name')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "PIPSQLVM2"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('PIPSQLVM2DnsName')]"
+        }
+      }
+    }
   ]
 }
