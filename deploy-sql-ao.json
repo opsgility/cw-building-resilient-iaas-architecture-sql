@@ -357,59 +357,59 @@
           ]
         }
       },
-      "resources": 
-      {
-        "name": "SQLDSC",
-        "type": "extensions",
-        "location": "[resourceGroup().location]",
-        "apiVersion": "2015-06-15",
-        "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]"
-        ],
-        "tags": {
-          "displayName": "SQLDSC"
-        },
-        "properties": {
-          "publisher": "Microsoft.Powershell",
-          "type": "DSC",
-          "typeHandlerVersion": "2.72",
-          "autoUpgradeMinorVersion": true,
-          "settings": {
-            "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]",
-            "sasToken": "[parameters('_artifactsLocationSasToken')]",
-            "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
-            "properties": {
-              "nodeName": "[parameters('SQLVM-1Name')]"
-            }
+      "resources": [
+        {
+          "name": "SQLDSC",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]"
+          ],
+          "tags": {
+            "displayName": "SQLDSC"
           },
-          "protectedSettings": {}
-        }
-      },
-      {
-        "name": "DomJoin1",
-        "type": "extensions",
-        "location": "[resourceGroup().location]",
-        "apiVersion": "2015-06-15",
-        "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]",
-          "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'),'/extensions/SQLDSC')]"
-        ],
-        "tags": {
-          "displayName": "DomJoin1"
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.72",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "modulesUrl": "[concat(parameters('_artifactsLocation'), '/', 'dsc1.zip')]",
+              "sasToken": "[parameters('_artifactsLocationSasToken')]",
+              "configurationFunction": "[variables('SQLDSCConfigurationFunction')]",
+              "properties": {
+                "nodeName": "[parameters('SQLVM-1Name')]"
+              }
+            },
+            "protectedSettings": {}
+          }
         },
-        "properties": {
-          "publisher": "Microsoft.Compute",
-          "type": "CustomScriptExtension",
-          "typeHandlerVersion": "1.4",
-          "autoUpgradeMinorVersion": false,
-          "settings": {
-            "fileUris": [
-              "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
-            ],
-            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
+        {
+          "name": "DomJoin1",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('SQLVM-1Name'),'/extensions/SQLDSC')]"
+          ],
+          "tags": {
+            "displayName": "DomJoin1"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": false,
+            "settings": {
+              "fileUris": [
+                "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'), parameters('_artifactsLocationSasToken'))]"
+              ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
+            }
           }
         }
-      }
       ]
     },
     {
