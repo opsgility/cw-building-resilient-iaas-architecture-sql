@@ -357,7 +357,7 @@
           ]
         }
       },
-      "resources": witn
+      "resources": 
       {
         "name": "SQLDSC",
         "type": "extensions",
