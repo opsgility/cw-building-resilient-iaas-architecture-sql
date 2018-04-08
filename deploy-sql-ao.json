@@ -121,6 +121,7 @@
   "variables": {
     "PIPSQLVM1DnsName": "[concat('sql1', uniqueString(resourceGroup().id))]",
     "PIPSQLVM2DnsName": "[concat('sql2', uniqueString(resourceGroup().id))]",
+    "scriptFolder": ".",
     "imagePublisherWitness": "MicrosoftWindowsServer",
     "imageOfferWitness": "WindowsServer",
     "imagePublisherSQL": "MicrosoftSqlServer",
@@ -391,7 +392,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin1ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin1ScriptFilePath'))]"
             }
           }
         }
@@ -544,7 +545,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin2ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin2ScriptFilePath'))]"
             }
           }
         }
@@ -644,7 +645,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('DomJoin3ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin3ScriptFilePath'))]"
             }
           }
         }
