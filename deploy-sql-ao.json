@@ -156,6 +156,9 @@
     "DomJoin1ScriptFilePath": "CustomScripts/DomJoin1.ps1",
     "DomJoin2ScriptFilePath": "CustomScripts/DomJoin2.ps1",
     "DomJoin3ScriptFilePath": "CustomScripts/DomJoin3.ps1",
+    "DomJoin1ScriptFileName": "DomJoin1.ps1",
+    "DomJoin2ScriptFileName": "DomJoin2.ps1",
+    "DomJoin3ScriptFileName": "DomJoin3.ps1",
     "PIPSQLVM1Name": "PIPSQLVM1",
     "PIPSQLVM2Name": "PIPSQLVM2"
   },
@@ -392,7 +395,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin1ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin1ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin1ScriptFileName'))]"
             }
           }
         }
@@ -545,7 +548,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin2ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin2ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin2ScriptFileName'))]"
             }
           }
         }
@@ -645,7 +648,7 @@
               "fileUris": [
                 "[concat(parameters('_artifactsLocation'), '/', variables('DomJoin3ScriptFilePath'))]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin3ScriptFilePath'))]"
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('DomJoin3ScriptFileName'))]"
             }
           }
         }
