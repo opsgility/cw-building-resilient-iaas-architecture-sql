@@ -33,7 +33,7 @@
     },
     "WitnessImageSKU": {
       "type": "string",
-      "defaultValue": "2012-R2-Datacenter",
+      "defaultValue": "2016-Datacenter",
       "metadata": {
         "description": "The Windows version for the Witness VM"
       }
@@ -64,18 +64,10 @@
       "minLength": 1,
       "defaultValue": "SQLVM-1"
     },
-    "SQLVM-1WindowsOSVersion": {
-      "type": "string",
-      "defaultValue": "SQL2016-WS2012R2"
-    },
     "SQLVM-2Name": {
       "type": "string",
       "minLength": 1,
       "defaultValue": "SQLVM-2"
-    },
-    "SQLVM-2WindowsOSVersion": {
-      "type": "string",
-      "defaultValue": "SQL2016-WS2012R2"
     },
     "WitnessName": {
       "type": "string",
@@ -84,7 +76,7 @@
     },
     "WitnessWindowsOSVersion": {
       "type": "string",
-      "defaultValue": "2012-R2-Datacenter"
+      "defaultValue": "2016-Datacenter"
     },
     "ExistingVirtualNetworkName": {
       "type": "string",
