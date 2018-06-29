@@ -22,7 +22,7 @@
       "metadata": {
         "description": "domain to join password"
       },
-      "defaultValue": "litware.com"
+      "defaultValue": "contoso.com"
     },
     "SQLImageSKU": {
       "type": "string",
@@ -84,7 +84,7 @@
       "metadata": {
         "description": "Name of existing virtual network"
       },
-      "defaultValue": "LitwareVNET"
+      "defaultValue": "contosoVNET"
     },
     "ExistingVirtualNetworkResourceGroup": {
       "type": "string",
@@ -92,7 +92,7 @@
       "metadata": {
         "description": "Resource group for existing virtual network"
       },
-      "defaultValue": "LitwareRG"
+      "defaultValue": "contosoRG"
     },
     "DataSubnetName": {
       "type": "string",

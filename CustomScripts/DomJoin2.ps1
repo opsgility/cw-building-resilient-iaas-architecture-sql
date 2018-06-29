@@ -25,7 +25,7 @@ Set-NetFirewallRule -DisplayGroup "Network Discovery" -Enabled True -Profile Dom
 #Join Domain
 $user = "demouser"
 $password = "demo@pass123"
-$domain = "litware.com"
+$domain = "contoso.com"
 $smPassword = (ConvertTo-SecureString $password -AsPlainText -Force)
 
 $domainUser = "$domain\$user"
