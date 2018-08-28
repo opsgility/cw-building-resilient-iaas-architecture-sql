@@ -79,12 +79,15 @@ Node $nodeName
 	$dbdestination = "C:\SQDATA\AdventureWorks2012.bak"
 	Invoke-WebRequest $dbsource -OutFile $dbdestination 
 
-	$mdf = New-Object Microsoft.SqlServer.Management.Smo.RelocateFile("AdventureWorks2012_Data", "F:\Data\AdventureWorks2012.mdf")
-	$ldf = New-Object Microsoft.SqlServer.Management.Smo.RelocateFile("AdventureWorks2012_Log", "F:\Logs\AdventureWorks2012.ldf")
+    # This code is required to fix SMO version mismatches with SQL
+    $sqlServerSnapinVersion = (Get-Command Restore-SqlDatabase).ImplementingType.Assembly.GetName().Version.ToString()
+    $assemblySqlServerSmoExtendedFullName = "Microsoft.SqlServer.SmoExtended, Version=$sqlServerSnapinVersion, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+
+	$mdf = New-Object "Microsoft.SqlServer.Management.Smo.RelocateFile, $assemblySqlServerSmoExtendedFullName" ("AdventureWorks2012_Data", "F:\Data\AdventureWorks2012.mdf")
+	$ldf = New-Object "Microsoft.SqlServer.Management.Smo.RelocateFile, $assemblySqlServerSmoExtendedFullName" ("AdventureWorks2012_Log", "F:\Logs\AdventureWorks2012.ldf")
 
 	# Restore the database from the backup
-	Restore-SqlDatabase -ServerInstance Localhost -Database AdventureWorks `
-					-BackupFile $dbdestination -RelocateFile @($mdf,$ldf) -ReplaceDatabase 
+	Restore-SqlDatabase -ServerInstance Localhost -Database AdventureWorks -BackupFile $dbdestination -RelocateFile @($mdf,$ldf) -ReplaceDatabase 
 	New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound –Protocol TCP –LocalPort 1433 -Action allow 
 	New-NetFirewallRule -DisplayName "SQL AG Endpoint" -Direction Inbound –Protocol TCP –LocalPort 5022 -Action allow 
 	New-NetFirewallRule -DisplayName "SQL AG Load Balancer Probe Port" -Direction Inbound –Protocol TCP –LocalPort 59999 -Action allow 

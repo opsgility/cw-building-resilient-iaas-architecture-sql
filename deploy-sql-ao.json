@@ -84,7 +84,7 @@
       "metadata": {
         "description": "Name of existing virtual network"
       },
-      "defaultValue": "contosoVNET"
+      "defaultValue": "VNET1"
     },
     "ExistingVirtualNetworkResourceGroup": {
       "type": "string",
@@ -92,7 +92,7 @@
       "metadata": {
         "description": "Resource group for existing virtual network"
       },
-      "defaultValue": "contosoRG"
+      "defaultValue": "ContosoRG"
     },
     "DataSubnetName": {
       "type": "string",
@@ -117,7 +117,7 @@
     "imagePublisherWitness": "MicrosoftWindowsServer",
     "imageOfferWitness": "WindowsServer",
     "imagePublisherSQL": "MicrosoftSqlServer",
-    "imageOfferSQL": "SQL2016-WS2016",
+    "imageOfferSQL": "SQL2016SP2-WS2016",
     "availabilitySetName": "SQLAvSet",
     "vhdStorageType": "Premium_LRS",
     "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
